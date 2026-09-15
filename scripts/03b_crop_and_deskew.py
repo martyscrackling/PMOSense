@@ -4,47 +4,79 @@
 Pipeline position:
     dataset/cleaned/ -> [this script] -> dataset/deskewed/ -> 04_resize_images.py
 
---- REVISION 2 NOTE ---
-Revision 1 used a purely pixel-level (local-texture) test for padding.
-On real JPEGs the boundary between a flat bar and real tissue is itself
-blurry (JPEG compression smears it into a gradient a few pixels wide),
-so a per-pixel test leaves a faint residual sliver right at that
-boundary - neither clearly "flat" nor clearly "textured". This revision
-fixes that by deciding bar removal at the ROW/COLUMN level instead of
-the pixel level: a whole row's mean+std is far more stable than any
-individual pixel near a blurry edge, so the cut point is sharp instead
-of ragged. Region-based (pixel-level) detection is still used, but now
-only for the second pass (wedges and anything the row/column pass
-didn't catch), where painting-over rather than cropping is used
-instead.
+--- REVISION 4 NOTE ---
+Revision 3's Hough-line rotation detector was wrong: it found the
+*longest* straight line in the image, which on Image_441 was actually
+one of the motion-blur streak lines (a real texture artifact, unrelated
+to frame rotation), not the actual wedge-cut boundary. Rotating by that
+angle didn't straighten the image at all - confirmed by testing both
+signs and visually inspecting the result.
+
+Replaced with a geometric method: fit a convex hull to the tissue
+region and look for a PAIR of long, similarly-angled hull edges sitting
+in DIAGONALLY OPPOSITE quadrants of the image (top-left + bottom-right,
+or top-right + bottom-left). This is the actual geometric signature of
+a rotated rectangle clipped by a square canvas - a real rotation always
+cuts two opposite corners at the same angle, while incidental long hull
+edges (from the natural curved fan boundary, or coincidental chords)
+don't have a matching opposite-corner partner at a similar angle. Tested
+against all 5 known real samples: only Image_441 (the one genuinely
+rotated example) triggers a detection, with an angle that visually
+straightens it; the other 4 correctly report no rotation needed.
+---
+
+--- REVISION 3 NOTE (superseded above, kept for history) ---
+Two real bugs found on your Image_629.jpg / Image_441.jpg / Image_479.jpg
+samples:
+
+1. GRAY BARS NOT REMOVED (Image_629, Image_479): their bars measure
+   ~154-157 brightness, below the old brightness_thresh of 170 - so they
+   were being read as legitimate tissue. Real tissue in these same
+   images averages ~65-72, so brightness_thresh is lowered to 140,
+   which comfortably separates the two with margin on both sides.
+
+2. ROTATION NEVER DETECTED (Image_441): this image's rotation-corner
+   fill is BLACK, not white. Revision 2's rotation detector only looked
+   for BRIGHT flat border-connected regions to estimate tilt (on
+   purpose - see Revision 1/2 notes below on why brightness mattered
+   for the natural black sector background) - which means it is
+   fundamentally blind to black-filled rotation. Fixed by adding a
+   SECOND, independent rotation estimator: a Hough line transform that
+   directly finds the long, straight, high-contrast boundary line the
+   corner crop itself creates - the rotation artifact is a very sharp
+   edge, easily detected as a strong line by cv2.HoughLinesP,
+   regardless of whether the surrounding fill is black or white. This
+   is now the PRIMARY rotation check; the original brightness-based
+   check still runs as a fallback for cases the Hough check misses.
+---
 
 Method, in order:
-  1. ROTATION: fit a rotated bounding box to the "content" region
-     (non-flat-bright-border-connected pixels, same test as before) and
-     rotate the image straight if it's tilted by more than
-     `angle_thresh` degrees. Skipped entirely for images that don't
-     need it (most of them) to avoid unnecessary interpolation blur.
+  1. ROTATION (two independent checks, either can trigger a correction):
+     a. Hough-line check (primary): find long, straight edges via Canny
+        + HoughLinesP. If enough of them cluster tightly around one
+        non-axis-aligned angle, that's the tilt - this is what catches
+        black-filled rotated frames like Image_441.
+     b. Region-based check (fallback): fit a rotated bounding box to
+        the "non-flat-bright-border-connected" content region, as in
+        earlier revisions - catches bright-filled rotated frames if the
+        Hough check happens to miss them (e.g. a very short/small tilt
+        with no long clean edge for Hough to grab onto).
   2. BAR TRIMMING (row/column level): scan in from each of the 4 edges;
-     a row (or column) counts as part of a padding bar if its mean
-     intensity is above `brightness_thresh` AND its std-dev is below
-     `row_std_thresh` (i.e., the WHOLE row is uniformly bright, not
-     just a lucky pixel). Stop at the first row/column that fails this
-     test - that boundary is used as a hard crop line. This removes
-     Image_031-style full-width/height bars cleanly.
-  3. WEDGE PAINT-OUT (pixel level): on the now-cropped image, re-run the
-     original local-texture-based padding detection (flat AND bright
-     AND connected to the border) and paint any matches black. This is
-     what removes Image_717-style triangular corner wedges, which
-     cropping can never fully remove without cutting into real tissue
-     (crops are always rectangular; wedges aren't).
+     a row/column counts as a padding bar if its mean intensity is
+     above `brightness_thresh` AND its own std-dev is below
+     `row_std_thresh` (i.e. uniformly bright across its full length).
+  3. WEDGE PAINT-OUT (pixel level): on the cropped image, re-run local-
+     texture-based padding detection (flat AND bright AND connected to
+     the border) and paint any matches black - removes corner wedges
+     that cropping alone can't (crops are rectangular, wedges aren't).
 
-Every decision (rotation angle, crop box, pixels painted) is logged per
-image.
+Every decision is logged per image, including WHICH rotation check (if
+either) fired, for debugging future cases.
 
 Usage:
     python 03b_crop_and_deskew.py --in_dir dataset/cleaned \
         --out_dir dataset/deskewed \
-        --brightness_thresh 170 --row_std_thresh 12 \
+        --brightness_thresh 140 --row_std_thresh 12 \
         --texture_thresh 6 --angle_thresh 3 \
         --log reports/deskew_log.jsonl
 """
@@ -59,8 +91,68 @@ import pcos_utils as utils
 
 
 # ---------------------------------------------------------------------------
-# Shared pixel-level padding detector (used for rotation-angle estimation
-# AND for the final wedge paint-out pass)
+# Rotation check A: geometric convex-hull method (primary)
+# ---------------------------------------------------------------------------
+
+def estimate_angle_geometric(img: np.ndarray, min_len_frac: float = 0.15,
+                              min_angle_dev: float = 7.0, pair_tol: float = 15.0):
+    """Finds the tissue region's convex hull and looks for a pair of long,
+    similarly-angled edges in diagonally opposite quadrants - the actual
+    geometric signature of a rotated rectangle clipped by a square canvas.
+    Returns (angle, found)."""
+    h, w = img.shape
+    diag = np.hypot(h, w)
+    tissue = (img > 30).astype(np.uint8) * 255
+    tissue = cv2.morphologyEx(tissue, cv2.MORPH_CLOSE, np.ones((15, 15), np.uint8))
+    contours, _ = cv2.findContours(tissue, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return 0.0, False
+    c = max(contours, key=cv2.contourArea)
+    hull = cv2.convexHull(c).reshape(-1, 2)
+    n = len(hull)
+
+    def quadrant(pt):
+        x, y = pt
+        return (0 if x < w / 2 else 1, 0 if y < h / 2 else 1)
+
+    edges = []
+    for i in range(n):
+        p1, p2 = hull[i], hull[(i + 1) % n]
+        dx, dy = float(p2[0] - p1[0]), float(p2[1] - p1[1])
+        length = np.hypot(dx, dy)
+        if length < min_len_frac * diag:
+            continue
+        angle = np.degrees(np.arctan2(dy, dx))
+        if angle <= -90: angle += 180
+        elif angle > 90: angle -= 180
+        if angle > 45: angle -= 90
+        elif angle <= -45: angle += 90
+        if abs(angle) < min_angle_dev:
+            continue  # too close to axis-aligned to be a real wedge cut
+        mid = ((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2)
+        edges.append({"length": length, "angle": angle, "quadrant": quadrant(mid)})
+
+    best_pair = None
+    for i in range(len(edges)):
+        for j in range(i + 1, len(edges)):
+            qa, qb = edges[i]["quadrant"], edges[j]["quadrant"]
+            if not (qa[0] != qb[0] and qa[1] != qb[1]):  # must be diagonally opposite
+                continue
+            if abs(edges[i]["angle"] - edges[j]["angle"]) > pair_tol:
+                continue
+            total_len = edges[i]["length"] + edges[j]["length"]
+            if best_pair is None or total_len > best_pair[0]:
+                w_angle = (edges[i]["length"] * edges[i]["angle"] +
+                           edges[j]["length"] * edges[j]["angle"]) / total_len
+                best_pair = (total_len, w_angle)
+
+    if best_pair is None:
+        return 0.0, False
+    return best_pair[1], True
+
+
+# ---------------------------------------------------------------------------
+# Rotation check B: region/brightness based (fallback, from earlier revisions)
 # ---------------------------------------------------------------------------
 
 def local_std(img: np.ndarray, k: int = 9) -> np.ndarray:
@@ -100,18 +192,14 @@ def largest_contour(mask: np.ndarray):
     return max(contours, key=cv2.contourArea)
 
 
-# ---------------------------------------------------------------------------
-# Stage 1: rotation
-# ---------------------------------------------------------------------------
-
-def estimate_rotation_angle(img: np.ndarray, texture_thresh: float,
-                             brightness_thresh: int, min_content_frac: float):
+def estimate_angle_region(img: np.ndarray, texture_thresh: float,
+                           brightness_thresh: int, min_content_frac: float):
     h, w = img.shape
     padding = border_connected_padding_mask(img, texture_thresh, brightness_thresh)
     content = 255 - padding
     contour = largest_contour(content)
     if contour is None or cv2.contourArea(contour) < min_content_frac * h * w:
-        return 0.0, False  # (angle, found_content)
+        return 0.0, False
 
     (_, _), (rw, rh), angle = cv2.minAreaRect(contour)
     if rw < rh:
@@ -131,14 +219,11 @@ def rotate_image(img: np.ndarray, angle: float) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
-# Stage 2: row/column bar trimming (sharp, aggregate-statistics based)
+# Bar trimming (row/column level) + wedge paint-out (pixel level)
 # ---------------------------------------------------------------------------
 
 def trim_bars(img: np.ndarray, brightness_thresh: int, row_std_thresh: float,
               max_trim_frac: float = 0.35):
-    """Strip contiguous bright+uniform rows/columns from each of the 4
-    edges. max_trim_frac caps how much can be trimmed from one side, as
-    a safety limit in case brightness_thresh is set too aggressively."""
     h, w = img.shape
     row_mean = img.mean(axis=1)
     row_std = img.std(axis=1)
@@ -173,27 +258,30 @@ def trim_bars(img: np.ndarray, brightness_thresh: int, row_std_thresh: float,
 
 def process(img: np.ndarray, texture_thresh: float, brightness_thresh: int,
             row_std_thresh: float, angle_thresh: float, min_content_frac: float):
-    angle, found = estimate_rotation_angle(img, texture_thresh, brightness_thresh, min_content_frac)
-    if not found:
-        return img, {"status": "skipped_no_content_found", "angle": 0.0,
-                      "trim_box": None, "residual_padding_pixels_painted": 0}
+    angle_geom, found_geom = estimate_angle_geometric(img)
+    angle_region, found_region = estimate_angle_region(img, texture_thresh, brightness_thresh, min_content_frac)
 
-    rotated_flag = abs(angle) > angle_thresh
+    # Both estimators return angles in the SAME convention (already
+    # normalized to the direct cv2.getRotationMatrix2D correction angle -
+    # confirmed empirically on Image_441: rotating by the geometric
+    # estimator's raw output value, unnegated, produced the correctly
+    # straightened result).
+    if found_geom and abs(angle_geom) > angle_thresh:
+        angle, rotation_source = angle_geom, "geometric"
+    elif found_region and abs(angle_region) > angle_thresh:
+        angle, rotation_source = angle_region, "region"
+    else:
+        angle, rotation_source = 0.0, "none"
+
+    rotated_flag = angle != 0.0
     img_t = rotate_image(img, angle) if rotated_flag else img
-    if not rotated_flag:
-        angle = 0.0
 
     trimmed, trim_box = trim_bars(img_t, brightness_thresh, row_std_thresh)
     if trimmed.size == 0:
         return img_t, {"status": "trim_failed", "angle": float(angle),
-                        "trim_box": trim_box, "residual_padding_pixels_painted": 0}
+                        "rotation_source": rotation_source, "trim_box": trim_box,
+                        "residual_padding_pixels_painted": 0}
 
-    # Second pass: paint out anything the crop couldn't remove (wedges).
-    # Dilated by more than the earlier bar-trim pass: a sharp boundary
-    # between padding and real background produces elevated local std
-    # right at the edge itself (that's what an edge is), so it dodges
-    # the "flat" test no matter how texture_thresh is tuned - a few
-    # extra pixels of dilation is what actually removes that rim.
     padding_final = border_connected_padding_mask(trimmed, texture_thresh, brightness_thresh)
     padding_dilated = cv2.dilate(padding_final, np.ones((9, 9), np.uint8))
     residual_px = int(np.count_nonzero(padding_dilated))
@@ -204,6 +292,7 @@ def process(img: np.ndarray, texture_thresh: float, brightness_thresh: int,
     return result, {
         "status": status,
         "angle": float(angle),
+        "rotation_source": rotation_source,
         "trim_box": list(trim_box),
         "residual_padding_pixels_painted": residual_px,
     }
@@ -215,15 +304,15 @@ if __name__ == "__main__":
     ap.add_argument("--out_dir", default="dataset/deskewed")
     ap.add_argument("--texture_thresh", type=float, default=6.0,
                      help="Pixel-level local std-dev below this counts as 'flat' "
-                          "(used for rotation-angle estimation and wedge paint-out).")
-    ap.add_argument("--brightness_thresh", type=int, default=170,
-                     help="Intensity above this counts as 'bright' padding, both for the "
-                          "pixel-level test and the row/column test.")
+                          "(used for the region-based rotation fallback and wedge paint-out).")
+    ap.add_argument("--brightness_thresh", type=int, default=140,
+                     help="Intensity above this counts as 'bright' padding. Lowered from 170 "
+                          "after finding real gray bars around 154-157 with real tissue "
+                          "averaging 65-72 in the same images - 140 keeps comfortable margin "
+                          "on both sides. Re-check against a histogram if bars still survive.")
     ap.add_argument("--row_std_thresh", type=float, default=12.0,
                      help="A row/column counts as a uniform padding bar if its own std-dev "
-                          "is below this - i.e. it's uniformly bright across its full length, "
-                          "not just bright on average. Raise if real bars aren't being fully "
-                          "trimmed; lower if real tissue rows are being cut into.")
+                          "is below this - i.e. it's uniformly bright across its full length.")
     ap.add_argument("--angle_thresh", type=float, default=3.0,
                      help="Minimum tilt (degrees) before rotation is applied.")
     ap.add_argument("--min_content_frac", type=float, default=0.02)
@@ -245,7 +334,7 @@ if __name__ == "__main__":
         cv2.imwrite(str(dest), out_img)
 
         utils.append_param_log(args.log, {"file": str(rel), **info})
-        if info["status"] in ("skipped_no_content_found", "trim_failed"):
+        if info["status"] == "trim_failed":
             needs_review.append(str(rel))
 
     if needs_review:

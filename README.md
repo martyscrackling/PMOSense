@@ -28,7 +28,7 @@ scripts/                the pipeline itself, run in numeric order
 ```
 
 ## Running it on your real dataset
-
+# add python .\scripts in terminal
 ```bash
 cd scripts
 python 01_dataset_inspection.py --raw_dir ../dataset/raw --out ../reports/dataset_summary.json
