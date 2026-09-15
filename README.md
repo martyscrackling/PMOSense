@@ -105,8 +105,3 @@ and the choice changes the implementation substantially:
    that uses the classical pipeline as a labeling aid rather than the
    final detector.
 
-None of these are things I can decide for you — they depend on what
-data/access you actually have. Once you tell me which path applies,
-I'll build the corresponding script(s) (06_follicle_detection.py and
-07_follicle_measurement.py, matching the numbering in your original task
-list).
