@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>PCOSense | AI-Powered PCOS Detection</title>
+  
+  <!-- Tailwind + Font Awesome + Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="antialiased">
+
+  <!-- Main Container -->
+  <div class="max-w-6xl mx-auto px-4 py-6 md:py-8">
+    <!-- Header with Logo -->
+    <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-gradient-to-br from-purple-500 to-pink-400 w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
+          <i class="fas fa-venus text-white text-xl" aria-hidden="true"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800 tracking-tight">PCOSense<span class="text-purple-600">.</span></h1>
+          <p class="text-xs text-gray-500">AI · Ultrasound · Explainable</p>
+        </div>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <button id="navDashboardBtn" class="px-4 py-2 rounded-full text-sm font-medium bg-white shadow-sm text-gray-700 hover:bg-purple-50 transition"><i class="fas fa-chalkboard-user mr-1"></i> Dashboard</button>
+        <button id="navHistoryBtn" class="px-4 py-2 rounded-full text-sm font-medium bg-white shadow-sm text-gray-700 hover:bg-purple-50 transition"><i class="fas fa-clock-rotate-left mr-1"></i> History</button>
+        <button id="newScreeningNavBtn" class="px-4 py-2 rounded-full bg-purple-600 text-white shadow-sm text-sm font-medium hover:bg-purple-700 transition"><i class="fas fa-plus-circle mr-1"></i> New Screening</button>
+      </div>
+    </div>
+
+    <!-- API Status Indicator -->
+    <div id="apiStatus" class="mb-4 text-sm flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100">
+      <span id="apiStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
+      <span id="apiStatusText" class="text-gray-600">Checking API connection...</span>
+    </div>
+
+    <!-- Dynamic Views Container -->
+    <div id="appViewContainer" class="transition-all duration-300"></div>
+  </div>
+
+  <!-- Hidden Camera Modal -->
+  <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-camera text-purple-500 mr-2"></i>Capture Ultrasound Image</h3>
+        <button id="closeCameraBtn" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+      <div class="relative bg-black rounded-xl overflow-hidden">
+        <video id="cameraVideo" class="w-full max-h-[400px] object-contain" autoplay playsinline></video>
+        <canvas id="cameraCanvas" class="hidden"></canvas>
+      </div>
+      <div class="flex justify-center gap-4 mt-4">
+        <button id="capturePhotoBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition"><i class="fas fa-camera mr-2"></i>Capture</button>
+        <button id="switchCameraBtn" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition"><i class="fas fa-sync-alt mr-2"></i>Switch Camera</button>
+      </div>
+      <p id="cameraStatus" class="text-center text-sm text-gray-500 mt-3">Position the ultrasound image in frame</p>
+      <input type="file" id="cameraFileInput" accept="image/*" class="hidden">
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="js/app.js"></script>
+</body>
+</html>  
