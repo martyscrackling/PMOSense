@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+  <title id="title">Patient and clinician conversation</title>
+  <desc id="desc">Two people share a conversation with a speech bubble between them.</desc>
+  <rect width="640" height="180" rx="24" fill="#e4eee9"/>
+  <circle cx="168" cy="75" r="31" fill="#3f715d"/><path d="M119 150c8-42 90-42 98 0" fill="#315a4a"/>
+  <circle cx="472" cy="75" r="31" fill="#b94b70"/><path d="M423 150c8-42 90-42 98 0" fill="#7e2948"/>
+  <path d="M225 54h190a18 18 0 0 1 18 18v28a18 18 0 0 1-18 18H300l-25 18 5-18h-55a18 18 0 0 1-18-18V72a18 18 0 0 1 18-18Z" fill="#e8f4fb" stroke="#315a4a" stroke-width="6"/>
+  <circle cx="285" cy="86" r="7" fill="#b94b70"/><circle cx="320" cy="86" r="7" fill="#b94b70"/><circle cx="355" cy="86" r="7" fill="#b94b70"/>
+</svg>

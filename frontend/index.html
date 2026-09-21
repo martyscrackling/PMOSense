@@ -1,71 +1,696 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>PCOSense | AI-Powered PCOS Detection</title>
-  
-  <!-- Tailwind + Font Awesome + Google Fonts -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>PCOSense | Ultrasound Review Suite</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    />
 </head>
-<body class="antialiased">
 
-  <!-- Main Container -->
-  <div class="max-w-6xl mx-auto px-4 py-6 md:py-8">
-    <!-- Header with Logo -->
-    <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
-      <div class="flex items-center gap-3">
-        <div class="bg-gradient-to-br from-purple-500 to-pink-400 w-10 h-10 rounded-xl flex items-center justify-center shadow-md">
-          <i class="fas fa-venus text-white text-xl" aria-hidden="true"></i>
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-800 tracking-tight">PCOSense<span class="text-purple-600">.</span></h1>
-          <p class="text-xs text-gray-500">AI · Ultrasound · Explainable</p>
-        </div>
-      </div>
-      <div class="flex gap-3 flex-wrap">
-        <button id="navDashboardBtn" class="px-4 py-2 rounded-full text-sm font-medium bg-white shadow-sm text-gray-700 hover:bg-purple-50 transition"><i class="fas fa-chalkboard-user mr-1"></i> Dashboard</button>
-        <button id="navHistoryBtn" class="px-4 py-2 rounded-full text-sm font-medium bg-white shadow-sm text-gray-700 hover:bg-purple-50 transition"><i class="fas fa-clock-rotate-left mr-1"></i> History</button>
-        <button id="newScreeningNavBtn" class="px-4 py-2 rounded-full bg-purple-600 text-white shadow-sm text-sm font-medium hover:bg-purple-700 transition"><i class="fas fa-plus-circle mr-1"></i> New Screening</button>
-      </div>
+<body>
+
+    <div id="app">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="brand">
+
+                <div class="brand-mark">
+                    <span>PS</span>
+                </div>
+
+                <div class="brand-copy">
+                    <strong>PCOSense</strong>
+                    <small>Ultrasound Review Suite</small>
+                </div>
+
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <button
+                    class="nav-item active"
+                    id="navDashboardBtn"
+                    data-section="dashboard"
+                >
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </button>
+
+                <button
+                    class="nav-item"
+                    id="navAnalysisBtn"
+                    data-section="analysis"
+                >
+                    <span class="nav-icon">◉</span>
+                    <span>Image Analysis</span>
+                </button>
+
+                <button
+                    class="nav-item"
+                    id="navHistoryBtn"
+                    data-section="history"
+                >
+                    <span class="nav-icon">◷</span>
+                    <span>Review History</span>
+                </button>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="clinical-note">
+                    <div class="clinical-note-icon">+</div>
+
+                    <div>
+                        <strong>Clinical workspace</strong>
+                        <span>
+                            Designed for professional ultrasound review.
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOP BAR -->
+            <header class="topbar">
+
+                <div class="topbar-context">
+                    <span class="context-dot"></span>
+
+                    <span>
+                        PCOS ultrasound review
+                    </span>
+
+                    <span class="context-divider">/</span>
+
+                    <span class="context-muted">
+                        Clinical workspace
+                    </span>
+                </div>
+
+                <div class="topbar-right">
+
+                    <div class="status-indicator">
+                        <span></span>
+                        System ready
+                    </div>
+
+             
+                </div>
+
+            </header>
+
+
+            <!-- CONTENT -->
+            <div
+                id="appViewContainer"
+                class="page-content"
+            >
+
+
+                <!-- DASHBOARD -->
+                <section
+                    id="dashboard-section"
+                    class="content-section active"
+                >
+
+                    <div class="page-heading">
+
+                        <div>
+                            <span class="eyebrow">
+                                PCOSense
+                            </span>
+
+                            <h1>
+                                Ultrasound review,
+                                <em>made clearer.</em>
+                            </h1>
+
+                            <p>
+                                Review ovarian ultrasound images with
+                                structured follicle analysis and
+                                explainable PCOS detection.
+                            </p>
+                        </div>
+
+                        <button
+                            class="primary-button"
+                            data-section-target="analysis"
+                        >
+                            <span>＋</span>
+                            New analysis
+                        </button>
+
+                    </div>
+
+
+                    <!-- DISCLAIMER -->
+                    <div class="clinical-banner">
+
+                        <div class="banner-symbol">
+                            i
+                        </div>
+
+                        <div>
+                            <strong>
+                                Clinical decision support
+                            </strong>
+
+                            <p>
+                                Interpret results alongside patient
+                                history, physical examination, laboratory
+                                findings, and professional clinical
+                                judgment.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <!-- QUICK ACTIONS -->
+                    <div class="section-label">
+                        <span>Quick access</span>
+                    </div>
+
+                    <div class="dashboard-grid">
+
+                        <button
+                            class="dashboard-card analysis-card"
+                            data-section-target="analysis"
+                        >
+
+                            <div class="card-icon rose">
+                                ◉
+                            </div>
+
+                            <div class="card-content">
+
+                                <span class="card-kicker">
+                                    IMAGE ANALYSIS
+                                </span>
+
+                                <h2>
+                                    Analyze an ultrasound
+                                </h2>
+
+                                <p>
+                                    Upload an ovarian ultrasound image
+                                    and begin PCOS assessment.
+                                </p>
+
+                                <span class="card-link">
+                                    Start review →
+                                </span>
+
+                            </div>
+
+                        </button>
+
+
+                        <button
+                            class="dashboard-card history-card"
+                            data-section-target="history"
+                        >
+
+                            <div class="card-icon plum">
+                                ◷
+                            </div>
+
+                            <div class="card-content">
+
+                                <span class="card-kicker">
+                                    REVIEW HISTORY
+                                </span>
+
+                                <h2>
+                                    Previous analyses
+                                </h2>
+
+                                <p>
+                                    Access previously reviewed
+                                    ultrasound cases.
+                                </p>
+
+                                <span class="card-link">
+                                    View history →
+                                </span>
+
+                            </div>
+
+                        </button>
+
+
+                    </div>
+
+
+                    <!-- OVERVIEW -->
+                    <div class="section-label overview-label">
+                        <span>Workspace overview</span>
+                    </div>
+
+                    <div class="overview-grid">
+
+                        <div class="overview-card">
+
+                            <span class="overview-title">
+                                Detection workflow
+                            </span>
+
+                            <div class="workflow">
+
+                                <div class="workflow-step">
+                                    <span>01</span>
+                                    <p>Upload image</p>
+                                </div>
+
+                                <div class="workflow-line"></div>
+
+                                <div class="workflow-step">
+                                    <span>02</span>
+                                    <p>Image analysis</p>
+                                </div>
+
+                                <div class="workflow-line"></div>
+
+                                <div class="workflow-step">
+                                    <span>03</span>
+                                    <p>Explainable result</p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="overview-card clinical-overview">
+
+                            <span class="overview-title">
+                                Review principle
+                            </span>
+
+                            <p>
+                                PCOSense presents computational findings
+                                as supporting information rather than as
+                                a replacement for professional diagnosis.
+                            </p>
+
+                            <div class="overview-tag">
+                                Professional review
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ANALYSIS -->
+                <section
+                    id="analysis-section"
+                    class="content-section"
+                >
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                IMAGE ANALYSIS
+                            </span>
+
+                            <h1>
+                                Examine an ultrasound
+                            </h1>
+
+                            <p>
+                                Upload an ovarian ultrasound image for
+                                analysis and explainable visualization.
+                            </p>
+
+                        </div>
+
+                        <div class="section-status">
+                            <span></span>
+                            Ready for image
+                        </div>
+
+                    </div>
+
+
+                    <div class="analysis-layout">
+
+                        <!-- UPLOAD PANEL -->
+                        <div class="panel upload-panel">
+
+                            <div class="panel-header">
+
+                                <div>
+                                    <span class="panel-number">
+                                        01
+                                    </span>
+
+                                    <div>
+                                        <h2>
+                                            Select ultrasound image
+                                        </h2>
+
+                                        <p>
+                                            Use a clear ovarian ultrasound
+                                            image for the analysis.
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                id="upload-area"
+                                class="upload-area"
+                            >
+
+                                <div class="upload-symbol">
+                                    ↑
+                                </div>
+
+                                <h3>
+                                    Drop image here
+                                </h3>
+
+                                <p>
+                                    or select a file from your device
+                                </p>
+
+                                <button
+                                    id="browse-button"
+                                    class="secondary-button"
+                                    type="button"
+                                >
+                                    Choose image
+                                </button>
+
+                                <span class="upload-note">
+                                    JPG, JPEG or PNG
+                                </span>
+
+                                <input
+                                    type="file"
+                                    id="file-input"
+                                    accept="image/png,image/jpeg,image/jpg"
+                                    hidden
+                                />
+
+                            </div>
+
+
+                            <div class="camera-divider">
+                                <span>or</span>
+                            </div>
+
+
+                            <button
+                                id="camera-button"
+                                class="camera-button"
+                                type="button"
+                            >
+                                <span>⌾</span>
+                                Use camera
+                            </button>
+
+                        </div>
+
+
+                        <!-- IMAGE PREVIEW -->
+                        <div class="panel preview-panel">
+
+                            <div class="panel-header">
+
+                                <div>
+                                    <span class="panel-number">
+                                        02
+                                    </span>
+
+                                    <div>
+                                        <h2>
+                                            Image preview
+                                        </h2>
+
+                                        <p>
+                                            Confirm the image before
+                                            starting analysis.
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                id="image-preview-container"
+                                class="image-preview-container"
+                            >
+
+                                <div class="empty-preview">
+
+                                    <div class="empty-preview-icon">
+                                        ◌
+                                    </div>
+
+                                    <strong>
+                                        No image selected
+                                    </strong>
+
+                                    <span>
+                                        Your ultrasound preview
+                                        will appear here.
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                id="analyze-button"
+                                class="primary-button analyze-button"
+                                type="button"
+                                disabled
+                            >
+                                Analyze image
+                                <span>→</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CAMERA MODAL -->
+                    <div
+                        id="camera-modal"
+                        class="modal hidden"
+                    >
+
+                        <div class="modal-backdrop"></div>
+
+                        <div class="modal-card">
+
+                            <div class="modal-header">
+
+                                <div>
+                                    <span class="eyebrow">
+                                        CAMERA
+                                    </span>
+
+                                    <h2>
+                                        Capture ultrasound
+                                    </h2>
+                                </div>
+
+                                <button
+                                    id="close-camera"
+                                    class="modal-close"
+                                    type="button"
+                                >
+                                    ×
+                                </button>
+
+                            </div>
+
+                            <div class="camera-view">
+
+                                <video
+                                    id="camera-video"
+                                    autoplay
+                                    playsinline
+                                ></video>
+
+                                <div class="camera-frame"></div>
+
+                            </div>
+
+                            <div class="camera-controls">
+
+                                <button
+                                    id="capture-button"
+                                    class="capture-button"
+                                    type="button"
+                                >
+                                    Capture
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- RESULTS -->
+                <section
+                    id="results-section"
+                    class="content-section"
+                >
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                ANALYSIS RESULT
+                            </span>
+
+                            <h1>
+                                Ultrasound findings
+                            </h1>
+
+                            <p>
+                                Review the model output and supporting
+                                visual information.
+                            </p>
+
+                        </div>
+
+                        <button
+                            id="new-analysis-button"
+                            class="secondary-button"
+                        >
+                            ← New analysis
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="results-content"
+                        class="results-content"
+                    >
+                        <!-- Rendered by app.js -->
+                    </div>
+
+                </section>
+
+
+                <!-- HISTORY -->
+                <section
+                    id="history-section"
+                    class="content-section"
+                >
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                REVIEW HISTORY
+                            </span>
+
+                            <h1>
+                                Previous analyses
+                            </h1>
+
+                            <p>
+                                Review your previous ultrasound
+                                assessments.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="history-container"
+                        class="history-container"
+                    >
+                        <!-- Rendered by app.js -->
+                    </div>
+
+                </section>
+
+
+                <!-- RATING -->
+                <section
+                    id="rating-section"
+                    class="content-section"
+                >
+
+                    <div class="section-header">
+
+                        <div>
+
+                            <span class="eyebrow">
+                                PROFESSIONAL EVALUATION
+                            </span>
+
+                            <h1>
+                                Evaluate PCOSense
+                            </h1>
+
+                            <p>
+                                Your feedback helps evaluate the
+                                usability of the system.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="rating-container"
+                        class="rating-container"
+                    >
+                        <!-- Rendered by app.js -->
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
     </div>
+    <script src="js/app.js"></script>
 
-    <!-- API Status Indicator -->
-    <div id="apiStatus" class="mb-4 text-sm flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100">
-      <span id="apiStatusDot" class="w-2 h-2 rounded-full bg-gray-400"></span>
-      <span id="apiStatusText" class="text-gray-600">Checking API connection...</span>
-    </div>
-
-    <!-- Dynamic Views Container -->
-    <div id="appViewContainer" class="transition-all duration-300"></div>
-  </div>
-
-  <!-- Hidden Camera Modal -->
-  <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-camera text-purple-500 mr-2"></i>Capture Ultrasound Image</h3>
-        <button id="closeCameraBtn" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-      </div>
-      <div class="relative bg-black rounded-xl overflow-hidden">
-        <video id="cameraVideo" class="w-full max-h-[400px] object-contain" autoplay playsinline></video>
-        <canvas id="cameraCanvas" class="hidden"></canvas>
-      </div>
-      <div class="flex justify-center gap-4 mt-4">
-        <button id="capturePhotoBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition"><i class="fas fa-camera mr-2"></i>Capture</button>
-        <button id="switchCameraBtn" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition"><i class="fas fa-sync-alt mr-2"></i>Switch Camera</button>
-      </div>
-      <p id="cameraStatus" class="text-center text-sm text-gray-500 mt-3">Position the ultrasound image in frame</p>
-      <input type="file" id="cameraFileInput" accept="image/*" class="hidden">
-    </div>
-  </div>
-
-  <!-- JavaScript -->
-  <script src="js/app.js"></script>
 </body>
-</html>  
+</html>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title desc">
+  <title id="title">Different PCOS experiences</title>
+  <desc id="desc">Three varied paths represent different symptom experiences.</desc>
+  <rect width="640" height="180" rx="24" fill="#eee6ed"/>
+  <path d="M78 126c64-72 108-72 172 0s108 72 172 0 108-72 140 0" fill="none" stroke="#76506f" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="113" cy="91" r="24" fill="#c96182"/><circle cx="314" cy="91" r="24" fill="#3f715d"/><circle cx="526" cy="91" r="24" fill="#956a29"/>
+  <path d="M104 91h18M305 91h18M517 91h18" stroke="#fff1df" stroke-width="7" stroke-linecap="round"/>
+</svg>
