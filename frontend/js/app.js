@@ -383,7 +383,12 @@ function makeSelectCard(label, id, options, currentVal, icon) {
     const opts = options.map(opt =>
         `<option value="${opt}" ${currentVal === opt ? 'selected' : ''}>${opt === 'yes' ? 'Yes' : 'No'}</option>`
     ).join('');
-    return `<div class="field-card"><label class="field-label"><i class="fas ${icon} field-icon"></i>${label}</label><select id="${id}" class="field-input">${opts}</select></div>`;
+    const buttons = options.map(opt => {
+        const text = opt === 'yes' ? 'Yes' : 'No';
+        const selected = currentVal === opt;
+        return `<button type="button" class="symptom-toggle-option${selected ? ' selected' : ''}" data-value="${opt}" aria-pressed="${selected}">${text}</button>`;
+    }).join('');
+    return `<div class="field-card"><label class="field-label"><i class="fas ${icon} field-icon"></i>${label}</label><select id="${id}" class="symptom-toggle-value" aria-hidden="true" tabindex="-1">${opts}</select><div class="symptom-toggle" data-input="${id}" role="group" aria-label="${label}">${buttons}</div></div>`;
 }
 
 function renderImageUploadSection(ovaryType, label, dataURLs) {
@@ -406,10 +411,10 @@ function renderImageUploadSection(ovaryType, label, dataURLs) {
             <!-- Upload Area -->
             <div id="${id}UploadArea" class="upload-area rounded-xl p-4 text-center cursor-pointer transition">
                 <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 mb-2"></i>
-                <p class="text-slate-500 text-sm">Click to upload, or use the capture device</p>
+                <p class="text-slate-500 text-sm">Upload an ultrasound image or capture an image</p>
                 <div class="flex gap-3 justify-center mt-3">
                     <button class="upload-file-btn btn-chip btn-chip-blue" data-target="${id}">
-                        <i class="fas fa-folder-open mr-1"></i>${hasImages ? 'Add images' : 'Choose files'}
+                        <i class="fas fa-folder-open mr-1"></i>${hasImages ? 'Add images' : 'Choose image'}
                     </button>
                     <button class="camera-btn btn-chip btn-chip-teal" data-target="${id}">
                         <i class="fas fa-camera mr-1"></i>Capture
@@ -433,16 +438,19 @@ function renderClinicalUploadView() {
 
     return `
         <div class="panel">
+            <div class="page-action-row">
+                <button id="backFromClinical" class="btn-secondary" type="button"><i class="fas fa-arrow-left mr-1"></i> Back to dashboard</button>
+            </div>
             <div class="panel-header">
                 <i class="fas fa-notes-medical text-blue-600 text-2xl"></i>
-                <h2 class="panel-title">Clinical intake &amp; ultrasound</h2>
-                ${apiAvailable ? '<span class="ml-auto status-chip status-chip-online"><i class="fas fa-check-circle"></i> Model ready</span>' : '<span class="ml-auto status-chip status-chip-offline"><i class="fas fa-exclamation-triangle"></i> Simulation mode</span>'}
+                <h2 class="panel-title">Clinical information &amp; ultrasound</h2>
+                ${apiAvailable ? '<span class="ml-auto status-chip status-chip-online"><i class="fas fa-check-circle"></i> Model ready</span>' : '<span class="ml-auto status-chip status-chip-offline"><i class="fas fa-flask"></i> Demo mode</span>'}
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Left Column: Clinical Data -->
                 <div>
-                    <p class="section-label">Patient parameters</p>
+                    <p class="intake-subheading">Basic measurements</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="field-card"><label class="field-label"><i class="fas fa-calendar-alt field-icon"></i>Age</label><input type="number" id="ageInput" class="field-input" placeholder="e.g., 28" value="${clinicalData.age}"></div>
                         <div class="field-card"><label class="field-label"><i class="fas fa-ruler-vertical field-icon"></i>Height (cm)</label><input type="number" step="0.1" id="heightInput" class="field-input" placeholder="e.g., 165" value="${clinicalData.height}"></div>
@@ -451,32 +459,31 @@ function renderClinicalUploadView() {
                         <div class="field-card"><label class="field-label"><i class="fas fa-scale-balanced field-icon"></i>Weight (kg)</label><input type="number" step="0.1" id="weightInput" class="field-input" placeholder="e.g., 62" value="${clinicalData.weight}"></div>
                         <div class="field-card flex items-center"><div><label class="field-label"><i class="fas fa-calculator field-icon"></i>Computed BMI</label><div id="bmiDisplay" class="mt-1 text-lg font-semibold text-slate-800 font-mono">BMI <span id="bmiValue">${clinicalData.bmi || '—'}</span></div></div></div>
                     </div>
-                    <p class="section-label mt-5">Reported symptoms</p>
+                    <p class="intake-subheading mt-5">Clinical history</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         ${makeSelectCard('Menstrual irregularities', 'menstrualSelect', ['yes','no'], clinicalData.menstrualIrregularities, 'fa-droplet')}
                         ${makeSelectCard('Acne / hirsutism', 'acneSelect', ['yes','no'], clinicalData.acne, 'fa-face-frown')}
                         ${makeSelectCard('Unexplained weight gain', 'weightSelect', ['yes','no'], clinicalData.weightGain, 'fa-chart-line')}
-                        ${makeSelectCard('Family history (PCOS)', 'familySelect', ['yes','no'], clinicalData.familyHistory, 'fa-people-arrows')}
+                        ${makeSelectCard('Family history of PCOS', 'familySelect', ['yes','no'], clinicalData.familyHistory, 'fa-people-arrows')}
                     </div>
                 </div>
 
                 <!-- Right Column: Ultrasound Images -->
                 <div>
-                    <p class="section-label">Ultrasound imaging</p>
+                    <p class="intake-subheading">Ultrasound imaging</p>
                     <div class="space-y-4">
                         ${renderImageUploadSection('left', 'Left ovary', leftOvaryDataURLs)}
                         ${renderImageUploadSection('right', 'Right ovary', rightOvaryDataURLs)}
                     </div>
                     <div class="mt-4 text-xs text-slate-400">
-                        <i class="fas fa-circle-info mr-1"></i>At least one image (left or right ovary) is required to run analysis.
+                        <i class="fas fa-circle-info mr-1"></i>Upload at least one ovarian ultrasound image. Left, right, or both ovaries are supported.
                     </div>
                 </div>
             </div>
 
             <div class="mt-8 flex justify-end gap-3 border-t border-slate-200 pt-6">
-                <button id="cancelClinicalBtn" class="btn-secondary">Cancel</button>
-                <button id="startAnalysisBtn" class="btn-primary">
-                    <i class="fas fa-microscope mr-2"></i>Run analysis
+                <button id="startAnalysisBtn" class="btn-primary continue-analysis-btn">
+                    <i class="fas fa-arrow-right mr-2"></i>Continue to analysis
                 </button>
             </div>
         </div>
@@ -490,6 +497,9 @@ function renderClinicalUploadView() {
 function renderLoadingView() {
     return `
         <div class="panel text-center py-14">
+            <div class="page-action-row">
+                <button id="backFromLoading" class="btn-secondary" type="button"><i class="fas fa-arrow-left mr-1"></i> Back to dashboard</button>
+            </div>
             <div class="flex flex-col items-center gap-5">
                 <i class="fas fa-brain text-5xl text-blue-500 animate-pulse"></i>
                 <h3 class="text-2xl font-semibold text-slate-800">${apiAvailable ? 'Analyzing intake data and ultrasound imagery' : 'Running simulation model'}</h3>
@@ -570,6 +580,9 @@ function renderResultsView(aiResult, clinical, imageURL) {
 
     return `
         <div class="panel p-0 overflow-hidden">
+            <div class="page-action-row page-action-row-inset">
+                <button id="backFromResults" class="btn-secondary" type="button"><i class="fas fa-arrow-left mr-1"></i> Back to dashboard</button>
+            </div>
             <div class="p-6 bg-slate-50 border-b border-slate-200">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <h2 class="text-2xl font-bold text-slate-800"><i class="fas fa-chart-simple mr-2 text-blue-600"></i>Assessment results</h2>
@@ -854,7 +867,7 @@ function renderSUSPage() {
 
 function renderHistoryView() {
     if (screeningHistory.length === 0) {
-        return `<div class="panel text-center py-16"><i class="fas fa-clock-rotate-left text-5xl text-slate-200 mb-3"></i><p class="text-slate-400">No screenings recorded yet.</p><button id="startFromEmptyHistory" class="mt-4 btn-primary">+ New screening</button></div>`;
+        return `<div class="panel text-center py-16"><div class="page-action-row page-action-row-inset"><button id="backFromHistory" class="btn-secondary" type="button"><i class="fas fa-arrow-left mr-1"></i> Back to dashboard</button></div><i class="fas fa-clock-rotate-left text-5xl text-slate-200 mb-3"></i><p class="text-slate-400">No screenings recorded yet.</p><button id="startFromEmptyHistory" class="mt-4 btn-primary">+ New screening</button></div>`;
     }
     let rows = '';
     screeningHistory.forEach(entry => {
@@ -887,7 +900,7 @@ function renderHistoryView() {
             </div>
         `;
     });
-    return `<div class="panel"><div class="flex justify-between items-center mb-4"><h2 class="panel-title"><i class="fas fa-clock-rotate-left text-blue-600 mr-2"></i>Screening history</h2><button id="clearHistoryBtn" class="text-xs text-red-600 hover:underline">Clear all</button></div><div class="space-y-2">${rows}</div><div class="mt-6 flex justify-end"><button id="newFromHistoryBtn" class="btn-primary"><i class="fas fa-plus mr-1"></i> New screening</button></div></div>`;
+    return `<div class="panel"><div class="page-action-row"><button id="backFromHistory" class="btn-secondary" type="button"><i class="fas fa-arrow-left mr-1"></i> Back to dashboard</button></div><div class="flex justify-between items-center mb-4"><h2 class="panel-title"><i class="fas fa-clock-rotate-left text-blue-600 mr-2"></i>Screening history</h2><button id="clearHistoryBtn" class="text-xs text-red-600 hover:underline">Clear all</button></div><div class="space-y-2">${rows}</div><div class="mt-6 flex justify-end"><button id="newFromHistoryBtn" class="btn-primary"><i class="fas fa-plus mr-1"></i> New screening</button></div></div>`;
 }
 
 // ============================================
@@ -903,46 +916,53 @@ function renderDashboard() {
         '../dataset/cleaned/PCOS/image10027.jpg',
         '../dataset/cleaned/Healthy/Image_059.jpg'
     ];
-    const awarenessImages = [
-        'assets/awareness-calendar.svg',
-        'assets/awareness-variation.svg',
-        'assets/awareness-conversation.svg',
-        'assets/awareness-support.svg'
-    ];
     const carouselItems = [...carouselImages, ...carouselImages]
         .map((src, index) => `<div class="ultrasound-slide"><img src="${src}" alt="Ovarian ultrasound sample ${index % carouselImages.length + 1}" loading="lazy"></div>`)
         .join('');
 
     return `
         <section class="content-section active">
-            <div class="ultrasound-carousel" aria-label="Ultrasound image carousel">
-                <div class="ultrasound-track">
-                    ${carouselItems}
+            <div class="landing-hero">
+                <div class="hero-copy">
+                    <span class="eyebrow">For clinicians reviewing ovarian ultrasound</span>
+                    <h1>Turn a difficult review into a <em>clearer conversation.</em></h1>
+                    <p class="hero-lead">PCOSense brings ultrasound review, clinical intake, and explainable findings into one focused workspace, so you can spend less time piecing evidence together.</p>
+                    <div class="hero-actions">
+                        <button class="primary-button hero-primary" id="dashboardAnalysisBtn" type="button"><span>◉</span> Start an image review</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="page-heading">
-                <div>
-                    <span class="eyebrow">PCOSense</span>
-                    <h1>Ultrasound review, <em>made clearer.</em></h1>
-                    <p>Review ovarian ultrasound images with structured follicle analysis and explainable PCOS detection.</p>
+                <div class="hero-demo" aria-label="PCOSense ultrasound review preview">
+                    <div class="demo-topline"><span class="demo-status"><i></i> PCOSense / New review</span><span class="demo-ready"><i></i> Ready</span></div>
+                    <div class="demo-workspace">
+                        <div class="demo-image-wrap">
+                            <img src="../dataset/cleaned/PCOS/image10029.jpg" alt="Ultrasound image shown in the PCOSense review workspace">
+                            <div class="demo-scan-label">ULTRASOUND PREVIEW</div>
+                            <span class="demo-region-mark"></span>
+                        </div>
+                        <div class="demo-details">
+                            <span class="demo-details-kicker">STRUCTURED REVIEW</span>
+                            <h2>Ovarian image analysis</h2>
+                            <div class="demo-detail-row"><span>Image quality</span><strong>Good</strong></div>
+                            <div class="demo-detail-row"><span>Clinical intake</span><strong>Ready</strong></div>
+                            <div class="demo-detail-row"><span>Explainability</span><strong>Included</strong></div>
+                            <button class="demo-open" type="button">Open workspace <span>↗</span></button>
+                        </div>
+                    </div>
                 </div>
-                <button id="dashboardStartBtn" class="primary-button" type="button">
-                    <span>＋</span> New analysis
-                </button>
             </div>
 
             <div class="clinical-banner">
                 <div class="banner-symbol">i</div>
                 <div>
-                    <strong>Clinical decision support</strong>
+                    <strong>Clinical decision support <span>Not a diagnosis.</span></strong>
                     <p>Interpret results alongside patient history, physical examination, laboratory findings, and professional clinical judgment.</p>
                 </div>
             </div>
 
             <div class="section-label"><span>Quick access</span></div>
             <div class="dashboard-grid">
-                <button class="dashboard-card analysis-card" id="dashboardAnalysisBtn" type="button">
+                <button class="dashboard-card analysis-card" id="dashboardAnalysisQuickBtn" type="button">
                     <div class="card-icon rose">◉</div>
                     <div class="card-content">
                         <span class="card-kicker">IMAGE ANALYSIS</span>
@@ -951,7 +971,7 @@ function renderDashboard() {
                         <span class="card-link">Start review →</span>
                     </div>
                 </button>
-                <button class="dashboard-card history-card" id="dashboardHistoryBtn" type="button">
+                <button class="dashboard-card history-card" id="dashboardHistoryQuickBtn" type="button">
                     <div class="card-icon plum">◷</div>
                     <div class="card-content">
                         <span class="card-kicker">REVIEW HISTORY</span>
@@ -965,53 +985,18 @@ function renderDashboard() {
             <div class="section-label overview-label"><span>Workspace overview</span></div>
             <div class="overview-grid">
                 <div class="overview-card">
-                    <span class="overview-title">Detection workflow</span>
+                    <span class="overview-title">PCOS detection workflow</span>
+                    <p class="workflow-intro">From ultrasound upload to explainable findings in three steps.</p>
                     <div class="workflow">
-                        <div class="workflow-step"><span>01</span><p>Upload image</p></div>
-                        <div class="workflow-line"></div>
-                        <div class="workflow-step"><span>02</span><p>Image analysis</p></div>
-                        <div class="workflow-line"></div>
-                        <div class="workflow-step"><span>03</span><p>Explainable result</p></div>
+                        <div class="workflow-step workflow-step-upload"><div class="workflow-icon-row"><span class="workflow-number">01 — UPLOAD</span><span class="workflow-visual workflow-visual-upload">▣</span></div><div class="workflow-copy"><strong>Upload ultrasound</strong><small>Add the ovarian ultrasound and relevant clinical information.</small></div></div>
+                        <div class="workflow-connector"><span></span></div>
+                        <div class="workflow-step workflow-step-analysis"><div class="workflow-icon-row"><span class="workflow-number">02 — ANALYZE</span><span class="workflow-visual workflow-visual-analysis">⌁</span></div><div class="workflow-copy"><strong>Analyze image</strong><small>The model evaluates ultrasound features associated with PCOS.</small></div></div>
+                        <div class="workflow-connector"><span></span></div>
+                        <div class="workflow-step workflow-step-result"><div class="workflow-icon-row"><span class="workflow-number">03 — REVIEW</span><span class="workflow-visual workflow-visual-result">✓</span></div><div class="workflow-copy"><strong>Review findings</strong><small>View the prediction, visual explanation, and supporting measurements.</small></div></div>
                     </div>
-                </div>
-                <div class="overview-card clinical-overview">
-                    <span class="overview-title">Review principle</span>
-                    <p>PCOSense presents computational findings as supporting information rather than as a replacement for professional diagnosis.</p>
-                    <div class="overview-tag">Professional review</div>
                 </div>
             </div>
 
-            <div class="section-label awareness-label"><span>PCOS awareness</span></div>
-            <div class="awareness-grid">
-                <article class="awareness-card awareness-rose">
-                    <img class="awareness-image" src="${awarenessImages[0]}" alt="Calendar and awareness ribbon illustration" loading="lazy">
-                    <span class="awareness-mark">01</span>
-                    <h2>September is PCOS Awareness Month</h2>
-                    <p>Each September, awareness efforts help educate the public about PCOS and support people affected by it.</p>
-                    <a class="awareness-source" href="https://pcoschallenge.org/pcos-awareness-month/" target="_blank" rel="noopener noreferrer">Learn more</a>
-                </article>
-                <article class="awareness-card awareness-plum">
-                    <img class="awareness-image" src="${awarenessImages[1]}" alt="Illustration showing different symptom pathways" loading="lazy">
-                    <span class="awareness-mark">02</span>
-                    <h2>PCOS can look different</h2>
-                    <p>Symptoms and experiences vary. Periods, skin, hair, weight, and fertility may be affected differently from person to person.</p>
-                    <a class="awareness-source" href="https://www.calm.com/blog/pcos-awareness-month" target="_blank" rel="noopener noreferrer">Read the overview</a>
-                </article>
-                <article class="awareness-card awareness-sage">
-                    <img class="awareness-image" src="${awarenessImages[2]}" alt="Patient and clinician having a conversation" loading="lazy">
-                    <span class="awareness-mark">03</span>
-                    <h2>Awareness supports earlier conversations</h2>
-                    <p>Recognizing possible symptoms can make it easier to speak with a qualified clinician and seek an individualized assessment.</p>
-                    <span class="awareness-note">Education is not a diagnosis</span>
-                </article>
-                <article class="awareness-card awareness-amber">
-                    <img class="awareness-image" src="${awarenessImages[3]}" alt="Supportive hands and heart illustration" loading="lazy">
-                    <span class="awareness-mark">04</span>
-                    <h2>Support matters all year</h2>
-                    <p>PCOS awareness is more than one month: respectful care, reliable information, and ongoing follow-up can make a meaningful difference.</p>
-                    <span class="awareness-note">Talk with your care team</span>
-                </article>
-            </div>
         </section>
     `;
 }
@@ -1085,6 +1070,21 @@ function updateActiveNav() {
 // ============================================
 
 function attachViewEvents() {
+    document.querySelectorAll('.symptom-toggle').forEach(toggle => {
+        const input = document.getElementById(toggle.dataset.input);
+        toggle.querySelectorAll('.symptom-toggle-option').forEach(button => {
+            button.onclick = () => {
+                if (!input) return;
+                input.value = button.dataset.value;
+                toggle.querySelectorAll('.symptom-toggle-option').forEach(option => {
+                    const selected = option === button;
+                    option.classList.toggle('selected', selected);
+                    option.setAttribute('aria-pressed', String(selected));
+                });
+            };
+        });
+    });
+
     document.querySelectorAll('.sidebar .nav-item').forEach(button => {
         button.onclick = () => {
             const views = {
@@ -1099,11 +1099,12 @@ function attachViewEvents() {
     });
 
     // Dashboard
-    document.getElementById('dashboardStartBtn')?.addEventListener('click', () => { resetClinicalForm();
-        switchView('clinical'); });
     document.getElementById('dashboardAnalysisBtn')?.addEventListener('click', () => { resetClinicalForm();
         switchView('clinical'); });
     document.getElementById('dashboardHistoryBtn')?.addEventListener('click', () => switchView('history'));
+    document.getElementById('dashboardAnalysisQuickBtn')?.addEventListener('click', () => { resetClinicalForm();
+        switchView('clinical'); });
+    document.getElementById('dashboardHistoryQuickBtn')?.addEventListener('click', () => switchView('history'));
 
     // Clinical upload - Image upload handlers
     setupImageUploadHandlers();
@@ -1158,7 +1159,10 @@ function attachViewEvents() {
         switchView('loading');
         startLoadingSimulation();
     });
-    document.getElementById('cancelClinicalBtn')?.addEventListener('click', () => switchView('dashboard'));
+    document.getElementById('backFromClinical')?.addEventListener('click', () => switchView('dashboard'));
+    document.getElementById('backFromResults')?.addEventListener('click', () => switchView('dashboard'));
+    document.getElementById('backFromHistory')?.addEventListener('click', () => switchView('dashboard'));
+    document.getElementById('backFromLoading')?.addEventListener('click', () => switchView('dashboard'));
 
     // Results buttons
     document.getElementById('saveAndHistoryBtn')?.addEventListener('click', () => {

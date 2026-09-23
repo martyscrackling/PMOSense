@@ -19,71 +19,6 @@
 
     <div id="app">
 
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-
-            <div class="brand">
-
-                <div class="brand-mark">
-                    <span>PS</span>
-                </div>
-
-                <div class="brand-copy">
-                    <strong>PCOSense</strong>
-                    <small>Ultrasound Review Suite</small>
-                </div>
-
-            </div>
-
-            <nav class="sidebar-nav">
-
-                <button
-                    class="nav-item active"
-                    id="navDashboardBtn"
-                    data-section="dashboard"
-                >
-                    <span class="nav-icon">⌂</span>
-                    <span>Dashboard</span>
-                </button>
-
-                <button
-                    class="nav-item"
-                    id="navAnalysisBtn"
-                    data-section="analysis"
-                >
-                    <span class="nav-icon">◉</span>
-                    <span>Image Analysis</span>
-                </button>
-
-                <button
-                    class="nav-item"
-                    id="navHistoryBtn"
-                    data-section="history"
-                >
-                    <span class="nav-icon">◷</span>
-                    <span>Review History</span>
-                </button>
-
-            </nav>
-
-            <div class="sidebar-footer">
-
-                <div class="clinical-note">
-                    <div class="clinical-note-icon">+</div>
-
-                    <div>
-                        <strong>Clinical workspace</strong>
-                        <span>
-                            Designed for professional ultrasound review.
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-        </aside>
-
-
         <!-- MAIN CONTENT -->
         <main class="main-content">
 
@@ -149,14 +84,6 @@
                             </p>
                         </div>
 
-                        <button
-                            class="primary-button"
-                            data-section-target="analysis"
-                        >
-                            <span>＋</span>
-                            New analysis
-                        </button>
-
                     </div>
 
 
@@ -170,6 +97,7 @@
                         <div>
                             <strong>
                                 Clinical decision support
+                                <span>Not a diagnosis.</span>
                             </strong>
 
                             <p>
@@ -269,49 +197,52 @@
                         <div class="overview-card">
 
                             <span class="overview-title">
-                                Detection workflow
+                                PCOS detection workflow
                             </span>
+
+                            <p class="workflow-intro">
+                                From ultrasound upload to explainable findings in three steps.
+                            </p>
 
                             <div class="workflow">
 
-                                <div class="workflow-step">
-                                    <span>01</span>
-                                    <p>Upload image</p>
+                                <div class="workflow-step workflow-step-upload">
+                                    <div class="workflow-icon-row">
+                                        <span class="workflow-number">01 — UPLOAD</span>
+                                        <span class="workflow-visual workflow-visual-upload">▣</span>
+                                    </div>
+                                    <div class="workflow-copy">
+                                        <strong>Upload ultrasound</strong>
+                                        <small>Add the ovarian ultrasound and relevant clinical information.</small>
+                                    </div>
                                 </div>
 
-                                <div class="workflow-line"></div>
+                                <div class="workflow-connector"><span></span></div>
 
-                                <div class="workflow-step">
-                                    <span>02</span>
-                                    <p>Image analysis</p>
+                                <div class="workflow-step workflow-step-analysis">
+                                    <div class="workflow-icon-row">
+                                        <span class="workflow-number">02 — ANALYZE</span>
+                                        <span class="workflow-visual workflow-visual-analysis">⌁</span>
+                                    </div>
+                                    <div class="workflow-copy">
+                                        <strong>Analyze image</strong>
+                                        <small>The model evaluates ultrasound features associated with PCOS.</small>
+                                    </div>
                                 </div>
 
-                                <div class="workflow-line"></div>
+                                <div class="workflow-connector"><span></span></div>
 
-                                <div class="workflow-step">
-                                    <span>03</span>
-                                    <p>Explainable result</p>
+                                <div class="workflow-step workflow-step-result">
+                                    <div class="workflow-icon-row">
+                                        <span class="workflow-number">03 — REVIEW</span>
+                                        <span class="workflow-visual workflow-visual-result">✓</span>
+                                    </div>
+                                    <div class="workflow-copy">
+                                        <strong>Review findings</strong>
+                                        <small>View the prediction, visual explanation, and supporting measurements.</small>
+                                    </div>
                                 </div>
 
-                            </div>
-
-                        </div>
-
-
-                        <div class="overview-card clinical-overview">
-
-                            <span class="overview-title">
-                                Review principle
-                            </span>
-
-                            <p>
-                                PCOSense presents computational findings
-                                as supporting information rather than as
-                                a replacement for professional diagnosis.
-                            </p>
-
-                            <div class="overview-tag">
-                                Professional review
                             </div>
 
                         </div>
