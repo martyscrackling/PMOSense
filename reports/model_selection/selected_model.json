@@ -1,0 +1,70 @@
+{
+  "selected_model": "efficientnet_b0",
+  "rule": "2 models are within 0.005 validation AUC of the best ('efficientnet_b0', 0.9995); 'efficientnet_b0' has the fewest parameters among them.",
+  "selection_split": "validation",
+  "threshold_mode": "val_f1",
+  "tie_margin": 0.005,
+  "validation_auc_mean_std": {
+    "densenet121": [
+      0.9989,
+      0.001
+    ],
+    "efficientnet_b0": [
+      0.9995,
+      0.0007
+    ],
+    "resnet50": [
+      0.9926,
+      0.0081
+    ]
+  },
+  "n_params": {
+    "densenet121": 6954881,
+    "efficientnet_b0": 4008829,
+    "resnet50": 23510081
+  },
+  "n_seeds": {
+    "densenet121": 3,
+    "efficientnet_b0": 3,
+    "resnet50": 3
+  },
+  "test_auc_seed_avg": {
+    "densenet121": 0.7131,
+    "efficientnet_b0": 0.7836,
+    "resnet50": 0.745
+  },
+  "test_auc_ci95_group_bootstrap": {
+    "densenet121": [
+      0.4743,
+      1.0
+    ],
+    "efficientnet_b0": [
+      0.6083,
+      1.0
+    ],
+    "resnet50": [
+      0.5411,
+      1.0
+    ]
+  },
+  "test_auc_difference_selected_minus_other": {
+    "densenet121": {
+      "mean": 0.0565,
+      "ci95": [
+        0.0,
+        0.1282
+      ],
+      "ci_excludes_zero": false
+    },
+    "resnet50": {
+      "mean": 0.0316,
+      "ci95": [
+        0.0,
+        0.0712
+      ],
+      "ci_excludes_zero": false
+    }
+  },
+  "shortcut_baseline_test_auc": 0.755,
+  "caution": "Trivial-feature baseline (brightness, black margins, tissue extent, file size; no anatomy) reaches test AUC 0.755; the best CNN reaches 0.784 (difference +0.029). The CNNs barely beat a baseline that uses no anatomy; interpret with caution."
+}

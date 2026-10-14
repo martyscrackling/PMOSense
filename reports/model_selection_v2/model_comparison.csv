@@ -1,0 +1,7 @@
+model,split,auc_mean,auc_std,accuracy_mean,accuracy_std,precision_mean,precision_std,recall_mean,recall_std,specificity_mean,specificity_std,f1_mean,f1_std,threshold_mean,threshold_std
+densenet121,test,0.9437,0.0851,0.8414,0.0839,0.8332,0.078,0.9841,0.0275,0.4667,0.281,0.9012,0.05,0.71,0.1873
+densenet121,val,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.71,0.1873
+efficientnet_b0,test,1.0,0.0,0.9977,0.004,0.9969,0.0054,1.0,0.0,0.9917,0.0144,0.9984,0.0027,0.5,0.0
+efficientnet_b0,val,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.5,0.0
+resnet50,test,0.9877,0.0136,0.8253,0.0691,0.8104,0.0626,0.9968,0.0055,0.375,0.25,0.8931,0.0383,0.5,0.0
+resnet50,val,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.5,0.0

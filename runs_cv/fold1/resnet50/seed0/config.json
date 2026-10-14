@@ -1,0 +1,33 @@
+{
+  "model": "resnet50",
+  "splits": ".\\reports\\cv\\fold1\\splits.csv",
+  "data_dir": ".\\dataset\\roi_center",
+  "external_dir": null,
+  "out_root": ".\\runs_cv\\fold1",
+  "seed": 0,
+  "epochs": 30,
+  "warmup_epochs": 3,
+  "patience": 7,
+  "batch_size": 32,
+  "lr_head": 0.001,
+  "lr_backbone": 0.0001,
+  "weight_decay": 0.0001,
+  "img_size": 224,
+  "num_workers": 0,
+  "no_pretrained": false,
+  "max_per_split": 0,
+  "n_params": 23510081,
+  "best_epoch": 3,
+  "best_val_auc": 1.0,
+  "train_seconds": 35.5,
+  "device": "cuda",
+  "torch": "2.11.0+cu128",
+  "python": "3.12.10",
+  "splits_md5": "48f46c99b6b8ea83fd72ddc1d275baea",
+  "pos_weight": 0.12681159377098083,
+  "n_images": {
+    "train": 311,
+    "val": 104,
+    "test": 104
+  }
+}

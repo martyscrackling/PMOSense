@@ -1,0 +1,2 @@
+epoch,phase,train_loss,val_loss,val_auc
+1,warmup,0.2815971374511719,0.2815924069812848,0.5

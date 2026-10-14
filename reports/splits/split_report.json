@@ -1,0 +1,42 @@
+{
+  "method": "orb_ransac",
+  "min_inliers": 35,
+  "n_features": 200,
+  "seed": 42,
+  "ratios_target": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "n_images_main": 949,
+  "n_groups_main": 413,
+  "largest_group": 40,
+  "max_per_group": 40,
+  "n_images_before_exclusions": 2521,
+  "n_excluded_label_conflict": 4,
+  "n_excluded_over_cap": 1568,
+  "splits": {
+    "train": {
+      "images": 647,
+      "groups": 316,
+      "pcos": 517,
+      "healthy": 130,
+      "pcos_fraction": 0.799
+    },
+    "val": {
+      "images": 151,
+      "groups": 34,
+      "pcos": 111,
+      "healthy": 40,
+      "pcos_fraction": 0.735
+    },
+    "test": {
+      "images": 151,
+      "groups": 63,
+      "pcos": 111,
+      "healthy": 40,
+      "pcos_fraction": 0.735
+    }
+  },
+  "leakage_check": "PASSED: every group is entirely inside one split"
+}

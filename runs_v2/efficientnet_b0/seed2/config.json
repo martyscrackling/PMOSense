@@ -1,0 +1,33 @@
+{
+  "model": "efficientnet_b0",
+  "splits": ".\\reports\\splits_v2\\splits.csv",
+  "data_dir": ".\\dataset\\roi_center",
+  "external_dir": null,
+  "out_root": ".\\runs_v2",
+  "seed": 2,
+  "epochs": 30,
+  "warmup_epochs": 3,
+  "patience": 7,
+  "batch_size": 32,
+  "lr_head": 0.001,
+  "lr_backbone": 0.0001,
+  "weight_decay": 0.0001,
+  "img_size": 224,
+  "num_workers": 0,
+  "no_pretrained": false,
+  "max_per_split": 0,
+  "n_params": 4008829,
+  "best_epoch": 21,
+  "best_val_auc": 1.0,
+  "train_seconds": 132.6,
+  "device": "cuda",
+  "torch": "2.11.0+cu128",
+  "python": "3.12.10",
+  "splits_md5": "e6d19fa1f0a1605ca823158f4d12e719",
+  "pos_weight": 0.1905737668275833,
+  "n_images": {
+    "train": 581,
+    "val": 145,
+    "test": 145
+  }
+}

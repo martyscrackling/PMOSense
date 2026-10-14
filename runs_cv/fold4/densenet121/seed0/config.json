@@ -1,0 +1,33 @@
+{
+  "model": "densenet121",
+  "splits": ".\\reports\\cv\\fold4\\splits.csv",
+  "data_dir": ".\\dataset\\roi_center",
+  "external_dir": null,
+  "out_root": ".\\runs_cv\\fold4",
+  "seed": 0,
+  "epochs": 30,
+  "warmup_epochs": 3,
+  "patience": 7,
+  "batch_size": 32,
+  "lr_head": 0.001,
+  "lr_backbone": 0.0001,
+  "weight_decay": 0.0001,
+  "img_size": 224,
+  "num_workers": 0,
+  "no_pretrained": false,
+  "max_per_split": 0,
+  "n_params": 6954881,
+  "best_epoch": 10,
+  "best_val_auc": 0.980072463768116,
+  "train_seconds": 58.9,
+  "device": "cuda",
+  "torch": "2.11.0+cu128",
+  "python": "3.12.10",
+  "splits_md5": "3080f105580fff5635f5085cea6136fc",
+  "pos_weight": 0.1304347813129425,
+  "n_images": {
+    "train": 312,
+    "val": 104,
+    "test": 103
+  }
+}

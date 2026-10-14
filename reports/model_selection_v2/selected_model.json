@@ -1,0 +1,70 @@
+{
+  "selected_model": "efficientnet_b0",
+  "rule": "3 models are within 0.005 validation AUC of the best ('densenet121', 1.0000); 'efficientnet_b0' has the fewest parameters among them.",
+  "selection_split": "validation",
+  "threshold_mode": "val_f1",
+  "tie_margin": 0.005,
+  "validation_auc_mean_std": {
+    "densenet121": [
+      1.0,
+      0.0
+    ],
+    "efficientnet_b0": [
+      1.0,
+      0.0
+    ],
+    "resnet50": [
+      1.0,
+      0.0
+    ]
+  },
+  "n_params": {
+    "densenet121": 6954881,
+    "efficientnet_b0": 4008829,
+    "resnet50": 23510081
+  },
+  "n_seeds": {
+    "densenet121": 3,
+    "efficientnet_b0": 3,
+    "resnet50": 3
+  },
+  "test_auc_seed_avg": {
+    "densenet121": 0.9871,
+    "efficientnet_b0": 1.0,
+    "resnet50": 0.9945
+  },
+  "test_auc_ci95_group_bootstrap": {
+    "densenet121": [
+      0.9781,
+      0.9966
+    ],
+    "efficientnet_b0": [
+      1.0,
+      1.0
+    ],
+    "resnet50": [
+      0.9802,
+      1.0
+    ]
+  },
+  "test_auc_difference_selected_minus_other": {
+    "densenet121": {
+      "mean": 0.0122,
+      "ci95": [
+        0.003,
+        0.022
+      ],
+      "ci_excludes_zero": true
+    },
+    "resnet50": {
+      "mean": 0.0061,
+      "ci95": [
+        0.0,
+        0.0179
+      ],
+      "ci_excludes_zero": false
+    }
+  },
+  "shortcut_baseline_test_auc": 0.926,
+  "caution": "Trivial-feature baseline (brightness, black margins, tissue extent, file size; no anatomy) reaches test AUC 0.926; the best CNN reaches 1.000 (difference +0.074). The baseline is already very high, so these CNN scores do NOT show that the models learned ovarian pathology: the classes are separable by image characteristics alone (different sources/framing). Do not interpret differences between models as clinical performance."
+}

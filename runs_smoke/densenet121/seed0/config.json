@@ -1,0 +1,33 @@
+{
+  "model": "densenet121",
+  "splits": ".\\reports\\splits\\splits.csv",
+  "data_dir": ".\\dataset\\enhanced_extended",
+  "external_dir": null,
+  "out_root": ".\\runs_smoke",
+  "seed": 0,
+  "epochs": 1,
+  "warmup_epochs": 3,
+  "patience": 7,
+  "batch_size": 32,
+  "lr_head": 0.001,
+  "lr_backbone": 0.0001,
+  "weight_decay": 0.0001,
+  "img_size": 224,
+  "num_workers": 0,
+  "no_pretrained": true,
+  "max_per_split": 64,
+  "n_params": 6954881,
+  "best_epoch": 1,
+  "best_val_auc": 0.007541478129713423,
+  "train_seconds": 3.3,
+  "device": "cuda",
+  "torch": "2.11.0+cu128",
+  "python": "3.12.10",
+  "splits_md5": "f79d944176304501e081edb5a852fd21",
+  "pos_weight": 0.2549019753932953,
+  "n_images": {
+    "train": 64,
+    "val": 64,
+    "test": 64
+  }
+}

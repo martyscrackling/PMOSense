@@ -1,0 +1,5 @@
+model,split,auc
+logistic regression,val,0.738
+logistic regression,test,0.755
+gradient boosting,val,0.92
+gradient boosting,test,0.718

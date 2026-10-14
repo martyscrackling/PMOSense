@@ -1,0 +1,27 @@
+{
+  "model": "efficientnet_b0",
+  "run": "runs_v2\\efficientnet_b0\\seed0",
+  "split": "test",
+  "n_images": 145,
+  "area_central": 0.5024713010204082,
+  "area_frame": 0.35427295918367346,
+  "per_class": {
+    "Healthy": {
+      "n": 40,
+      "central_enrich": 0.885263599230527,
+      "frame_enrich": 1.067791935283788,
+      "black_enrich": 0.5486207435514769
+    },
+    "PCOS": {
+      "n": 105,
+      "central_enrich": 1.2148685705681317,
+      "frame_enrich": 0.7719333116478152,
+      "black_enrich": 1.0495937330868172
+    }
+  },
+  "ablation_auc": {
+    "full_image": 1.0,
+    "centre_only": 1.0,
+    "periphery_only": 0.9978571428571429
+  }
+}

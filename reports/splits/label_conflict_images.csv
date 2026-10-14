@@ -1,0 +1,5 @@
+path,class,group_id,reason
+Healthy/Image_309.jpg,Healthy,1,matches an image of the other class
+Healthy/Image_497.jpg,Healthy,1,matches an image of the other class
+PCOS/image10510.jpg,PCOS,397,matches an image of the other class
+PCOS/image10789.jpg,PCOS,397,matches an image of the other class

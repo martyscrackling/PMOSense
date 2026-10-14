@@ -1,0 +1,18 @@
+{
+  "selected_model": "efficientnet_b0",
+  "rule": "highest pooled OOF AUC; ties within tie -> fewest params",
+  "pooled_oof_auc": {
+    "efficientnet_b0": 0.9889,
+    "densenet121": 0.9292,
+    "resnet50": 0.8781
+  },
+  "n_healthy_families": 25,
+  "n_pcos_families": 384,
+  "folds": 5,
+  "shortcut_baseline_oof_auc": 0.9453,
+  "selected_minus_baseline_auc": {
+    "diff": 0.0441,
+    "ci_lo": 0.0124,
+    "ci_hi": 0.0854
+  }
+}
